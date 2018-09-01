@@ -62,7 +62,9 @@ func main() {
 	flag.Parse()
 
 	r := openInput(source)
+	defer deferredClose(r)
 	f := openOutput(target)
+	defer deferredClose(f)
 	i := 0
 	c := 0
 
@@ -94,6 +96,13 @@ func main() {
 	writeStr(f, "\n")
 }
 
+//
+func deferredClose(f *os.File) {
+	if cerr := f.Close(); cerr != nil {
+		log.Fatal(fmt.Printf("File close failed: %q", cerr))
+	}
+}
+
 // openInput opens the appropriate input source of bytes to read
 func openInput(source string) (r *os.File) {
 
@@ -102,17 +111,10 @@ func openInput(source string) (r *os.File) {
 	if source == "" || source == "-" {
 		r = os.Stdin
 	} else {
-
 		r, err = os.Open(source)
 		if err != nil {
 			log.Fatal(fmt.Printf("File open failed: %q", err))
 		}
-
-		defer func() {
-			if cerr := r.Close(); cerr != nil && err == nil {
-				log.Fatal(fmt.Printf("File close failed: %q", cerr))
-			}
-		}()
 	}
 	return r
 }
@@ -126,16 +128,9 @@ func openOutput(target string) (f *os.File) {
 		f = os.Stdout
 	} else {
 		f, err = os.OpenFile(target, os.O_CREATE|os.O_WRONLY, 0644)
-
 		if err != nil {
 			log.Fatal(fmt.Printf("File open failed: %q", err))
 		}
-
-		defer func() {
-			if cerr := f.Close(); cerr != nil && err == nil {
-				log.Fatal(fmt.Printf("File close failed: %q", cerr))
-			}
-		}()
 	}
 	return f
 }
