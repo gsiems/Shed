@@ -151,7 +151,7 @@ func writeByte(f io.Writer, b byte, esChr bool, alNum bool) {
 		str = "0x00 "
 	} else if int(b) < 0x10 {
 		str = fmt.Sprintf("0x0%x ", b)
-	} else if alNum && int(b) >= 0x1e && int(b) <= 0x7e {
+	} else if alNum && int(b) >= 0x21 && int(b) <= 0x7e {
 		str = fmt.Sprintf("   %s ", string(b))
 	} else {
 		str = fmt.Sprintf("%#v ", b)
