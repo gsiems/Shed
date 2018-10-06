@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
+	//
+	"github.com/gsiems/go-read-wrap/srw"
 )
 
 var tr = map[byte]string{
@@ -63,8 +66,11 @@ func main() {
 
 	r := openInput(source)
 	defer deferredClose(r)
+	s := srw.BuffReader(0, r)
 	f := openOutput(target)
 	defer deferredClose(f)
+	w := bufio.NewWriter(f)
+
 	i := 0
 	c := 0
 
@@ -77,12 +83,12 @@ func main() {
 
 		if i >= width && width > 0 {
 			i = 0
-			writeStr(f, "\n")
+			writeStr(w, "\n")
 		}
 		i++
 
 		b := make([]byte, 1)
-		_, err := r.Read(b)
+		_, err := s.Read(b)
 		if err == io.EOF {
 			break
 		}
@@ -90,10 +96,11 @@ func main() {
 			log.Fatal(err)
 		}
 
-		writeByte(f, b[0], esChr, alNum)
+		writeByte(w, b[0], esChr, alNum)
 	}
 
-	writeStr(f, "\n")
+	writeStr(w, "\n")
+	w.Flush()
 }
 
 //
