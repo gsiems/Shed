@@ -30,5 +30,8 @@ All arguments are optional.
 
  **-o** *string* The output file to write to. If no file is specified then STDOUT is written to.
 
+ **-s** *int*    The number of bytes from the beginning of the file to skip
+                 before dumping. The default is to not skip any bytes.
+
  **-w** *int*    The number of bytes to output per line. The default is wrap at 16 bytes.
                  If w is less than 1 then all output are written to one line.
