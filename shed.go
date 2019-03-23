@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+
 	//
 	"github.com/gsiems/go-read-wrap/srw"
 )
@@ -52,6 +53,7 @@ func main() {
 	var alNum bool
 	var esChr bool
 	var byteCount int
+	var skipCount int
 	var source string
 	var target string
 	var width int
@@ -59,9 +61,10 @@ func main() {
 	flag.BoolVar(&alNum, "a", false, "Output ASCII letters, numbers, and symbols.")
 	flag.BoolVar(&esChr, "e", false, "Output codes for single character escape sequences.")
 	flag.IntVar(&byteCount, "c", 0, "The number of bytes to dump. The default is to dump the entire file.")
+	flag.IntVar(&skipCount, "s", 0, "The number of bytes to skip before dumping. The default is to not skip any bytes.")
 	flag.StringVar(&source, "i", "", "The input file to hexdump.")
 	flag.StringVar(&target, "o", "", "The output file to write to.")
-	flag.IntVar(&width, "w", 16, "The number of bytes to output per line.")
+	flag.IntVar(&width, "w", 16, "The number of bytes to output per line. Default is 16. Set to 0 to disable line wrapping.")
 	flag.Parse()
 
 	r := openInput(source)
@@ -74,18 +77,16 @@ func main() {
 	i := 0
 	c := 0
 
+	//if skipCount > 0 {
+	//	fmt.Printf("Skipping %d bytes\n", skipCount)
+	//}
+
 	for {
 
-		if byteCount > 0 && c >= byteCount {
+		c++
+		if byteCount > 0 && c > byteCount+skipCount {
 			break
 		}
-		c++
-
-		if i >= width && width > 0 {
-			i = 0
-			writeStr(w, "\n")
-		}
-		i++
 
 		b := make([]byte, 1)
 		_, err := s.Read(b)
@@ -96,7 +97,16 @@ func main() {
 			log.Fatal(err)
 		}
 
-		writeByte(w, b[0], esChr, alNum)
+		if c > skipCount {
+
+			if i >= width && width > 0 {
+				i = 0
+				writeStr(w, "\n")
+			}
+			i++
+
+			writeByte(w, b[0], esChr, alNum)
+		}
 	}
 
 	writeStr(w, "\n")
