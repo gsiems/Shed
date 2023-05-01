@@ -1,5 +1,5 @@
 module github.com/gsiems/Shed
 
-go 1.13
+go 1.20
 
-require github.com/gsiems/go-read-wrap v0.0.0-20181006014435-ff72d7c12979
+require github.com/gsiems/go-read-wrap v1.0.0
